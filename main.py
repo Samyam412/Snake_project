@@ -42,7 +42,9 @@ while True:
             sys.exit()
         if event.type == pygame.USEREVENT:
             snake.move_snake()
-
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                snake.direction == Vector2(0,-1)
     screen.fill((57,62,70))
     fruit.draw_fruit()
     snake.draw_snake()
