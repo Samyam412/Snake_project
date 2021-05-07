@@ -110,7 +110,23 @@ class FRUIT:
         fruit_rect = pygame.Rect(int(self.pos.x * cell_size), int(self.pos.y * cell_size), cell_size, cell_size)
         screen.blit(apple, fruit_rect)
 
-    # pygame.draw.rect(screen,(126,166,114),fruit_rect)
+
+    def randomize(self):
+        self.x = random.randint(0, cell_number - 1)
+        self.y = random.randint(0, cell_number - 1)
+        self.pos = Vector2(self.x, self.y)
+
+
+
+class ENEMY:
+
+    def __init__(self):
+        self.randomize()
+
+
+    def draw_enemy(self):
+        enemy_rect = pygame.Rect(int(self.pos.x * cell_size), int(self.pos.y * cell_size), cell_size, cell_size)
+        screen.blit(apple_2,enemy_rect)
 
     def randomize(self):
         self.x = random.randint(0, cell_number - 1)
@@ -122,6 +138,7 @@ class MAIN:
     def __init__(self):
         self.snake = SNAKE()
         self.fruit = FRUIT()
+        self.enemy = ENEMY()
 
     def update(self):
         self.snake.move_snake()
@@ -133,6 +150,7 @@ class MAIN:
         self.fruit.draw_fruit()
         self.snake.draw_snake()
         self.draw_score()
+        self.enemy.draw_enemy()
 
     def check_collision(self):
         if self.fruit.pos == self.snake.body[0]:
@@ -185,6 +203,7 @@ cell_number = 20
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
 clock = pygame.time.Clock()
 apple = pygame.image.load('Graphics/apple.png').convert_alpha()
+apple_2 = pygame.image.load('Graphics/apple_2.png').convert_alpha()
 game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
 
 SCREEN_UPDATE = pygame.USEREVENT
