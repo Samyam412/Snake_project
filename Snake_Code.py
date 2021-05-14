@@ -5,7 +5,6 @@ import random
 
 from pygame.math import Vector2
 
-
 class SNAKE:
     def __init__(self):
         self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]
@@ -90,6 +89,7 @@ class SNAKE:
             body_copy.insert(0, body_copy[0] + self.direction)
             self.body = body_copy[:]
             self.new_block = False
+
         else:
             body_copy = self.body[:-1]
             body_copy.insert(0, body_copy[0] + self.direction)
@@ -106,6 +106,35 @@ class SNAKE:
         self.direction = Vector2(0, 0)
 
 
+class PROJECTILE:
+    def __init__(self):
+        projectile_state = False
+        self.snake = SNAKE()
+        self.direction = self.snake.direction
+        self.projectile_up = pygame.image.load('Graphics/projectile_up.png').convert_alpha()
+        self.projectile_down = pygame.image.load('Graphics/projectile_down.png').convert_alpha()
+        self.projectile_right = pygame.image.load('Graphics/projectile_right.png').convert_alpha()
+        self.projectile_left = pygame.image.load('Graphics/projectile_left.png').convert_alpha()
+
+
+    def draw_projectile(self):
+        self.update()
+        x_pos = self.snake.body[0].x
+        y_pos = self.snake.body[0].y
+        projectile_rect = pygame.Rect(x_pos, y_pos, cell_size, cell_size)
+        screen.blit(self.head, projectile_rect)
+
+
+    def update(self):
+        head_relation = self.snake.body[1] - self.snake.body[0]
+        if head_relation == Vector2(1, 0):
+            self.head = self.projectile_left
+        elif head_relation == Vector2(-1, 0):
+            self.head = self.projectile_right
+        elif head_relation == Vector2(0, 1):
+            self.head = self.projectile_up
+        elif head_relation == Vector2(0, -1):
+            self.head = self.projectile_up
 
 class FRUIT:
     def __init__(self):
@@ -126,6 +155,7 @@ class ENEMY:
     def __init__(self):
         self.randomize()
 
+
     def draw_enemy(self):
         enemy_rect = pygame.Rect(int(self.pos.x * cell_size), int(self.pos.y * cell_size), cell_size, cell_size)
         screen.blit(apple_2, enemy_rect)
@@ -137,27 +167,35 @@ class ENEMY:
         self.changeX = 0
         self.changeY = cell_size
         self.movement = Vector2(self.changeX, self.changeY)
+
+
+
     def move_enemy(self):
         self.pos += self.movement
         if self.pos.x >= (cell_number * cell_size):
-            self.changeX = -1 * cell_size
+            self.changeX = -40
             self.pos.y += self.changeY
 
-        elif self.pos.x <= 0 :
-            self.changeX = cell_size
+        elif self.pos.x <= 0:
+            self.changeX = 40
             self.pos.y += self.changeY
+
+
 
 class MAIN:
     def __init__(self):
         self.snake = SNAKE()
         self.fruit = FRUIT()
         self.enemy = ENEMY()
+        self.projectile = PROJECTILE()
 
     def update(self):
         self.snake.move_snake()
-        self.enemy.move_enemy()
+       # self.enemy.move_enemy()
         self.check_collision()
         self.check_fail()
+        self.projectile.draw_projectile()
+
 
     def draw_elements(self):
         self.draw_grass()
@@ -166,12 +204,15 @@ class MAIN:
         self.draw_score()
         self.enemy.draw_enemy()
         self.draw_lives()
+        #self.projectile.draw_projectile()
 
     def check_collision(self):
         if self.fruit.pos == self.snake.body[0]:
             self.fruit.randomize()
             self.snake.add_block()
             self.snake.play_crunch_sound()
+            if len(self.snake.body) % 4 == 0:
+                self.enemy.randomize()
 
         if self.enemy.pos == self.snake.body[0]:
             if self.snake.health != 1:
@@ -204,6 +245,8 @@ class MAIN:
     def game_over(self):
         self.snake.reset()
         self.snake.health = 3
+
+
 
 
     def draw_grass(self):
@@ -241,9 +284,11 @@ pygame.init()
 cell_size = 40
 cell_number = 20
 screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
+pygame.display.set_caption("Snake Adventures")
 clock = pygame.time.Clock()
 apple = pygame.image.load('Graphics/apple.png').convert_alpha()
 apple_2 = pygame.image.load('Graphics/apple_2.png').convert_alpha()
+projectile = pygame.image.load('Graphics/Projectile_left.png')
 Game_menu = pygame.image.load('Graphics/Game_menu.jpg').convert_alpha()
 game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
 
@@ -276,6 +321,9 @@ while True:
                         if event.key == pygame.K_LEFT:
                             if main_game.snake.direction.x != 1:
                                 main_game.snake.direction = Vector2(-1, 0)
+                        if event.key == pygame.K_SPACE:
+                            main_game.projectile_state = True
+
 
                 screen.fill((70, 70, 70))
                 main_game.draw_elements()

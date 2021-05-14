@@ -1,6 +1,8 @@
 import pygame, sys , random
 from pygame.math import Vector2
+
 pygame.init()
+
 class FRUIT:
     def __init__(self):
         self.x = random.randint(0,cell_number-1)
