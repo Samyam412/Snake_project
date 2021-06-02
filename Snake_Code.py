@@ -183,6 +183,7 @@ class ENEMY:
 
 
 class MAIN:
+
     def __init__(self):
         self.snake = SNAKE()
         self.fruit = FRUIT()
@@ -204,6 +205,7 @@ class MAIN:
         self.draw_score()
         self.enemy.draw_enemy()
         self.draw_lives()
+        self.draw_highscore()
         #self.projectile.draw_projectile()
 
     def check_collision(self):
@@ -242,11 +244,16 @@ class MAIN:
             if block == self.snake.body[0]:
                 self.game_over()
 
+
+
+
+
+
+
     def game_over(self):
+
         self.snake.reset()
         self.snake.health = 3
-
-
 
 
     def draw_grass(self):
@@ -271,6 +278,7 @@ class MAIN:
         score_rect = score_surface.get_rect(center=(score_x, score_y))
         screen.blit(score_surface, score_rect)
 
+
     def draw_lives(self):
         score_text = str(f"Lives - {self.snake.health}")
         score_surface = game_font.render(score_text, True, (200, 40, 40))
@@ -278,6 +286,23 @@ class MAIN:
         score_y = int(cell_size * cell_number - 40)
         score_rect = score_surface.get_rect(center=(score_x, score_y))
         screen.blit(score_surface, score_rect)
+
+    def draw_highscore(self):
+        with open("highscore.txt.", "r") as f:
+            hiscore = f.read()
+
+        score1 = len(self.snake.body) - 3
+        if score1 >= int(hiscore):
+            hiscore = score1
+        score_text = str(f"Highscore - {hiscore}")
+        score_surface = game_font.render(score_text, True, (100, 100, 100))
+        score_x = int(cell_size * cell_number - 550)
+        score_y = int(cell_size * cell_number - 40)
+        score_rect = score_surface.get_rect(center=(score_x, score_y))
+        screen.blit(score_surface, score_rect)
+        with open("highscore.txt.", "w") as f:
+            f.write(str(hiscore))
+
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
@@ -295,8 +320,11 @@ game_font = pygame.font.Font('Font/PoetsenOne-Regular.ttf', 25)
 SCREEN_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SCREEN_UPDATE, 150)
 
+
+
 main_game = MAIN()
-while True:
+running = True
+while running:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
 
